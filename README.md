@@ -1,5 +1,7 @@
 # 42 Transcendence
 
+With dlitran y Lineath
+
 Proyecto final del Common Core de 42 School, enfocado en el desarrollo de una plataforma web para el juego Pong con funcionalidades multijugador y características adicionales implementadas a través de módulos.
 
 ## Descripción del Proyecto
