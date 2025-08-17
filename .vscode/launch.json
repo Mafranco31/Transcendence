@@ -1,0 +1,24 @@
+{
+	"configurations": [
+		{
+			"name": "Launch Program",
+			"cwd": "${workspaceFolder}",
+			"program": "${workspaceFolder}/backEnd/dataBase/src/database.ts",
+			"request": "launch",
+			"skipFiles": [
+				"<node_internals>/**"
+			],
+			"type": "node"
+		},
+		{
+			"name": "MatchMaker - Attach to Docker Container",
+			"type": "node",
+			"request": "attach",
+			"address": "localhost",
+			"port": 9229,
+			"localRoot": "${workspaceFolder}/backEnd/matchMaker",
+			"remoteRoot": "/usr/src/app",
+			"skipFiles": ["<node_internals>/**"]
+		}
+	]
+}

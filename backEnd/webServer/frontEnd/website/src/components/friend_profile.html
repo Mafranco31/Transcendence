@@ -1,0 +1,80 @@
+<!-- <H1 id="test" class="text-white"></H1> -->
+<div class="container mx-auto p-4 md:p-6">
+    <div class="flex space-x-2">
+      <button data-path='/' class="text-left nav-link bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-300 whitespace-nowrap">
+        Home
+      </button>
+      <button data-path='/profile' class="text-left nav-link bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-300 whitespace-nowrap">
+        Your profile
+      </button>
+    </div>
+  
+ <!-- Profile -->
+<div class="bg-gray-800 shadow-xl rounded-2xl p-6 md:p-8 max-w-3xl mx-auto space-y-8">
+  <!-- Avatar centré -->
+  <div class="flex flex-col items-center gap-4">
+    <img
+      id="avatar-box"
+      alt="User avatar"
+      class="rounded-full w-32 h-32 object-cover shadow-lg ring-1 ring-gray-700"
+    />
+  </div>
+
+  <div class="space-y-6">
+    <!-- Alias -->
+    <section class="space-y-2">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:gap-4">
+        <label class="text-lg font-semibold text-white w-28 shrink-0" for="pseudo">Alias :</label>
+        <!-- Colonne contenu -->
+        <div class="flex-1 min-w-0 mt-2 sm:mt-0">
+          <span id="pseudo" class="block text-lg text-indigo-400 font-medium break-words">...</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Bio -->
+    <section class="space-y-2">
+      <div class="flex flex-col sm:flex-row sm:items-start sm:gap-4">
+        <label class="text-lg font-semibold text-white w-28 shrink-0 pt-2" for="bio">Bio :</label>
+        <!-- Colonne contenu -->
+        <div class="flex-1 min-w-0 mt-2 sm:mt-0">
+          <span id="bio" class="block text-lg text-indigo-400 font-medium break-words whitespace-pre-wrap">...</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Creation / XP -->
+    <section class="pt-6 border-t border-gray-700 space-y-2">
+      <p class="text-lg text-gray-300">Creation date : <span id="creationDate" class="text-gray-100">...</span></p>
+      <p class="text-lg text-gray-300">Wins: <span id="wins" class="text-gray-100">0</span></p>
+      <p class="text-lg text-gray-300">Looses: <span id="looses" class="text-gray-100">0</span></p>
+    </section>
+  </div>
+</div>
+
+<!-- Matches -->
+<div class="max-w-3xl mx-auto mt-12">
+  <h2 class="text-2xl font-bold text-white mb-6 text-center">Last matches</h2>
+  <div id="matchs-list" class="space-y-4">
+    <p class="text-white text-center">Loading matches...</p>
+  </div>
+</div>
+
+<!-- Match template -->
+<template id="match-template">
+  <div class="p-4 rounded-lg shadow-md text-white">
+    <div class="flex justify-between items-center">
+      <div>
+        <p class="text-sm text-gray-200">
+          Opponent: <span class="text-indigo-300 font-semibold enemy-pseudo"></span>
+        </p>
+        <span class="result-badge inline-block mt-2 px-2 py-1 text-xs font-bold rounded-full">
+          RESULT
+        </span>
+      </div>
+      <div class="text-right">
+        <p class="text-lg font-bold score-text"></p>
+      </div>
+    </div>
+  </div>
+</template>

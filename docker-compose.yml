@@ -1,0 +1,114 @@
+networks:
+    proxy-network:
+        driver: bridge
+    backend-network:
+        driver: bridge
+
+volumes:
+    dataBase-volume:
+        driver: local
+        driver_opts:
+            type: none
+            o: bind
+            device: ${HOST_DB_VOL_PATH}
+    webServer-volume:
+        driver: local
+        driver_opts:
+            type: none
+            o: bind
+            device: ${HOST_WS_VOL_PATH}
+
+
+services:
+    proxy:
+        build: ${PROXY_NGINX_BUILD_PATH}
+        init: true
+        image: proxy-img
+        restart: unless-stopped
+        container_name: proxy
+        ports:
+            - "8080:8080"
+            - "8443:8443"
+        networks:
+            - proxy-network
+        depends_on:
+            - webServer
+            - serverPong
+
+    webServer:
+        build: ${WEBSERVER_NGINX_BUILD_PATH}
+        init: true
+        image: webserver-img
+        restart: unless-stopped
+        container_name: webServer
+        volumes:
+            - webServer-volume:/var/www/html/website/public/avatars
+        networks:
+            - proxy-network
+            - backend-network
+
+    dataBase:
+        build: ${DB_BUILD_PATH}
+        init: true
+        image: database-img
+        restart: unless-stopped
+        container_name: dataBase
+        volumes:
+            - dataBase-volume:/usr/src/app/data
+        networks:
+            - proxy-network
+            - backend-network
+
+    serverPong:
+        build: ${SPONG_BUILD_PATH}
+        init: true
+        image: serverpong-img
+        restart: unless-stopped
+        container_name: serverPong
+        networks:
+            - proxy-network 
+            - backend-network
+        depends_on:
+            - webServer
+
+    matchMaker:
+        build: ${MMAKER_BUILD_PATH}
+        init: true
+        image: maatchmaker-img
+        restart: unless-stopped
+        container_name: matchMaker
+        networks:
+            - proxy-network
+            - backend-network
+        depends_on:
+            - webServer
+
+    userManagement:
+        build: ${USER_MANAGEMENT_BUILD_PATH}
+        init: true
+        image: usermanager-img
+        restart: unless-stopped
+        container_name: userManagement
+        networks:
+            - proxy-network
+            - backend-network
+        env_file:
+            - .env
+        depends_on:
+            - dataBase
+            - webServer
+
+    userAuthentication:
+        build: ${USER_AUTHENTICATION_BUILD_PATH}
+        init: true
+        image: userauthentication-img
+        restart: unless-stopped
+        container_name: userAuthentication
+        env_file:
+            - .env
+        networks:
+            - proxy-network
+            - backend-network
+        depends_on:
+            - dataBase
+            - webServer

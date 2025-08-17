@@ -1,0 +1,31 @@
+<div id="topBar" class="relative z-20 bg-gray-500 text-white p-1 flex justify-between items-center">
+	<button class="px-3 py-1 rounded-md text-sm font-medium hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white">
+	</button>
+	<!--<select id="profileMenu">Profile</select>-->
+	<div class="dropdown-container relative ">
+		<button id="profileButton" class="px-3 py-1 rounded-md text-sm font-medium hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white">
+			Profile</button>
+
+		<!-- The container for the options, hidden by default  data-path='/profile'-->
+		<div id="dropdownMenu" class="absolute right-0 mt-2 w-48 origin-top-right rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none bg-gray-500 ">
+			<button data-path='/profile' class="relative z-10 nav-link bg-gray-500 block w-full text-left px-4 py-2 text-sm text-white hover:bg-gray-700 rounded-md">
+				View Profile</button>
+			<button data-path='/logout' class="relative z-10 nav-link bg-gray-500 block w-full text-left px-4 py-2 text-sm text-white hover:bg-gray-700 rounded-md">
+				Log out</button>
+		</div>
+	</div>
+</div>
+
+<canvas id="particle-canvas" class="w-full h-screen bg-gradient-to-b from-[rgb(10,10,50)] to-[rgb(60,10,60)] fixed top-0 left-0 -z-10">
+</canvas>
+
+<div class="relative z-10 flex flex-col justify-center items-center h-screen gap-5 ">
+<button id="1" data-path='/game' class="nav-link bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xl py-3 px-8 rounded-lg transition-colors duration-300 min-w-[250px]">
+	Online Game </button>
+<button id="5" data-path='/tournament' class="nav-link bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xl py-3 px-8 rounded-lg transition-colors duration-300 min-w-[250px]">
+	Tournament</button>
+<button id="6" data-path='/localgame' class="nav-link bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xl py-3 px-8 rounded-lg transition-colors duration-300 min-w-[250px]">
+	Local Game</button>
+<button id="6" data-path='/localtournament' class="nav-link bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xl py-3 px-8 rounded-lg transition-colors duration-300 min-w-[250px]">
+	Local Tournament</button>
+</div>

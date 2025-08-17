@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Profil</title>
+  <style>
+    .friend-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      max-width: 400px;
+      margin: 8px 0;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+    #avatar {
+      width: 120px;      /* largeur fixe */
+      height: 120px;     /* hauteur fixe */
+      border-radius: 50%; /* arrondi pour un style avatar */
+      object-fit: cover; /* recadre proprement */
+      border: 2px solid #ccc;
+    }
+
+  </style>
+</head>
+<body>
+  <h1>Bienvenue</h1>
+
+  <div id="avatar-container">
+    <img id="avatar" src="default_avatar.jpg" alt="Avatar utilisateur">
+    <input type="file" id="avatarInput" accept="image/jpeg" style="margin-top:10px;">
+    <button id="uploadAvatarBtn">Changer l’avatar</button>
+    <button id="deleteAvatarBtn" style="margin-top:5px; color:red;">Supprimer l’avatar</button>
+    <p id="avatarMessage" style="color: green;"></p>
+  </div>
+
+  <p>
+    Votre pseudo :
+    <span id="pseudo">...</span>
+    <input type="text" id="pseudoInput" style="display:none;">
+    <button id="editPseudoBtn">Modifier le pseudo</button>
+    <button id="savePseudoBtn" style="display:none;">Enregistrer</button>
+  </p>
+
+  <p>
+    Bio :
+    <span id="bio">...</span>
+    <textarea id="bioInput" style="display:none;"></textarea>
+    <button id="editBioBtn">Modifier la bio</button>
+    <button id="saveBioBtn" style="display:none;">Enregistrer</button>
+  </p>
+
+  <p>Date de création : <span id="creationDate">...</span></p>
+  <p>Expérience : <span id="experience">...</span></p>
+
+  <div id="twoFA-section" style="margin-top:20px;">
+    <h3>Authentification à deux facteurs</h3>
+    <button id="enable2FAButton">Activer la 2FA</button>
+    
+    <!-- ✅ Ajoute ici le bouton de suppression -->
+    <button id="disable2FAButton" style="margin-left:10px; color:red;">
+      Désactiver la 2FA
+    </button>
+    
+    <div id="qrCodeContainer" style="margin-top:15px; display:none;">
+      <p>Scannez ce QR code avec Google Authenticator :</p>
+      <img id="qrCodeImage" src="" alt="QR Code 2FA" style="max-width:200px; display:block;">
+      <p>Ou entrez cette clé manuellement : <span id="manualKey"></span></p>
+
+      <div style="margin-top:10px;">
+        <label for="verify2FACode">Code à 6 chiffres :</label>
+        <input type="text" id="verify2FACode" maxlength="6" style="width:80px;">
+        <button id="verify2FAButton">Vérifier et activer</button>
+      </div>
+      <p id="twoFAStatusMessage" style="margin-top:10px; color:green;"></p>
+    </div>
+  </div>
+
+
+
+  <button id="showPseudosBtn">Afficher tous les pseudos</button>
+
+  <ul id="pseudoList" style="margin-top: 20px; list-style: none; padding: 0;"></ul>
+
+  <p id="message" style="color: green;"></p>
+
+  <h1>Friends demands</h1>
+  <div id="friend-list"></div>
+
+  <h1>Friends</h1>
+  <div id="friend-list-accepted"></div>
+
+  <h1>Blocked Friends</h1>
+  <div id="friend-list-blocked"></div>
+
+  <button onclick="deleteAccount()">Supprimer mon compte</button>
+  <script>
+    async function deleteAccount() {
+      if (confirm('Êtes-vous sûr de vouloir supprimer votre compte ? Cette action est irréversible.')) {
+        const response = await fetch(`https://${window.location.hostname}:8443/usermanagement/front/delete/user`, {
+          method: 'DELETE',
+          credentials: 'include'
+        });
+
+        if (response.ok) {
+          alert('Votre compte a été supprimé avec succès.');
+          window.location.href = 'login.html';
+        } else {
+          alert('Erreur lors de la suppression du compte.');
+        }
+      }
+    }
+  </script>
+
+  <p id="message" style="color: green;"></p>
+
+  <script>
+    let username = '';
+
+    async function loadProfile() {
+      const sessionResponse = await fetch(`https://${window.location.hostname}:8443/usermanagement/front/get/profile_session`, {
+        method: 'GET',
+        credentials: 'include'
+      });
+
+      if (!sessionResponse.ok) {
+        window.location.href = 'login.html';
+        return;
+      }
+
+      const sessionData = await sessionResponse.json();
+      id = sessionData.name;
+
+      type BoolDictionary = {
+        [key: string]: boolean;
+      };
+
+      let dictionary: BoolDictionary;
+
+      const ws = new WebSocket(`wss://${window.location.hostname}:8443/userauthentication/front/ws/status?userId=${id}`);
+
+      ws.onopen = () => {
+        console.log("✅ WebSocket connectée → utilisateur en ligne");
+      };
+
+      ws.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        dictionary[data.id] = data.status;
+        if (data.status) {
+          console.log(`User ${data.id} online`);
+        } else {
+          console.log(`User ${data.id} ofline`);
+        }
+      };
+
+      ws.onclose = () => {
+        console.log("WebSocket fermée → utilisateur hors ligne");
+      };
+
+
+
+      const profileResponse = await fetch(`https://${window.location.hostname}:8443/usermanagement/front/get/profile?id=${id}`, {
+        method: 'GET',
+        credentials: 'include'
+      });
+
+      if (profileResponse.ok) {
+        const profile = (await profileResponse.json())[0];
+        document.getElementById('pseudo').textContent = profile.pseudo || 'Inconnu';
+        document.getElementById('pseudoInput').value = profile.pseudo || '';
+        document.getElementById('bio').textContent = profile.bio || 'Inconnu';
+        document.getElementById('bioInput').value = profile.bio || '';
+        document.getElementById('creationDate').textContent = profile.date_creation || 'Inconnue';
+        document.getElementById('experience').textContent = profile.experience || '0';
+        if (profile.avatar) {
+          // Si c'est une image encodée en base64
+          const avatarElement = document.getElementById('avatar');
+
+          // Si le backend renvoie déjà du base64 → "iVBORw0KGgo..."
+          // On doit le préfixer avec un mimetype (par exemple image/png)
+          avatarElement.src = `data:image/png;base64,${profile.avatar}`;
+        } else {
+          const avatarElement = document.getElementById('avatar');
+          avatarElement.src = 'default_avatar.jpg'; // ou 'default_avatar.png' selon où tu l’as mis
+        }
+
+      } else {
+        console.error('Erreur lors du chargement du profil');
+      }
+    }
+
+    // Modifier bio
+    document.getElementById('editBioBtn').addEventListener('click', () => {
+      document.getElementById('bio').style.display = 'none';
+      document.getElementById('bioInput').style.display = 'inline';
+      document.getElementById('editBioBtn').style.display = 'none';
+      document.getElementById('saveBioBtn').style.display = 'inline';
+    });
+
+    document.getElementById('saveBioBtn').addEventListener('click', async () => {
+      const newBio = document.getElementById('bioInput').value;
+
+      const response = await fetch(`https://${window.location.hostname}:8443/usermanagement/front/put/modify_bio`, {
+        method: 'PATCH',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ bio: newBio })
+      });
+
+      if (response.ok) {
+        document.getElementById('bio').textContent = newBio;
+        document.getElementById('message').textContent = 'Bio mise à jour.';
+      } else {
+        document.getElementById('message').textContent = 'Erreur lors de la mise à jour de la bio.';
+      }
+
+      document.getElementById('bio').style.display = 'inline';
+      document.getElementById('bioInput').style.display = 'none';
+      document.getElementById('editBioBtn').style.display = 'inline';
+      document.getElementById('saveBioBtn').style.display = 'none';
+    });
+
+    // Modifier pseudo
+    document.getElementById('editPseudoBtn').addEventListener('click', () => {
+      document.getElementById('pseudo').style.display = 'none';
+      document.getElementById('pseudoInput').style.display = 'inline';
+      document.getElementById('editPseudoBtn').style.display = 'none';
+      document.getElementById('savePseudoBtn').style.display = 'inline';
+    });
+
+    document.getElementById('savePseudoBtn').addEventListener('click', async () => {
+      const newPseudo = document.getElementById('pseudoInput').value;
+
+      const response = await fetch(`https://${window.location.hostname}:8443/usermanagement/front/put/modify_pseudo`, {
+        method: 'PATCH',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pseudo: newPseudo })
+      });
+
+      if (response.ok) {
+        document.getElementById('pseudo').textContent = newPseudo;
+        document.getElementById('message').textContent = 'Pseudo mis à jour.';
+      } else {
+        document.getElementById('message').textContent = 'Erreur lors de la mise à jour du pseudo.';
+      }
+
+      document.getElementById('pseudo').style.display = 'inline';
+      document.getElementById('pseudoInput').style.display = 'none';
+      document.getElementById('editPseudoBtn').style.display = 'inline';
+      document.getElementById('savePseudoBtn').style.display = 'none';
+    });
+    
+    // document.getElementById('showPseudosBtn').addEventListener('click', async () => {
+    //   const list = document.getElementById('pseudoList');
+    //   list.innerHTML = ''; // Réinitialise la liste
+
+    //   const response = await fetch('https://${window.location.hostname}:8443/usermanagement/front/get/pseudos', {
+    //     method: 'GET',
+    //     credentials: 'include'
+    //   });
+
+    //   if (!response.ok) throw new Error('Erreur lors de la récupération des pseudos.');
+
+    //   const pseudos = await response.json(); // attend un tableau ["alice", "bob", ...]
+
+    //   if (Array.isArray(pseudos) && pseudos.length > 0) {
+    //     pseudos.forEach(pseudo => {
+    //       const li = document.createElement('li');
+    //       li.textContent = pseudo.pseudo || 'Inconnu';
+    //       list.appendChild(li);
+    //     });
+    //   } else {
+    //     list.innerHTML = '<li>Aucun pseudo trouvé.</li>';
+    //   }
+    // });
+
+    document.getElementById('showPseudosBtn').addEventListener('click', async () => {
+      const list = document.getElementById('pseudoList');
+      list.innerHTML = ''; // Réinitialise la liste
+
+      const response = await fetch('/usermanagement/front/get/pseudos', {
+        method: 'GET',
+        credentials: 'include'
+      });
+
+      if (!response.ok) {
+        list.innerHTML = '<li>Erreur lors de la récupération des pseudos.</li>';
+        return;
+      }
+
+      const pseudos = await response.json(); // attend [{ pseudo: 'alice' }, { pseudo: 'bob' }]
+
+      if (Array.isArray(pseudos) && pseudos.length > 0) {
+        pseudos.forEach(({ pseudo }) => {
+          const li = document.createElement('li');
+          li.style.marginBottom = '10px';
+          li.style.display = 'flex';
+          li.style.justifyContent = 'space-between';
+          li.style.alignItems = 'center';
+          li.style.gap = '10px';
+
+          const span = document.createElement('span');
+          span.textContent = pseudo || 'Inconnu';
+
+          const button = document.createElement('button');
+          button.textContent = 'Ajouter';
+          button.addEventListener('click', async () => {
+            const res = await fetch(`https://${window.location.hostname}:8443/usermanagement/front/post/friendship`, {
+              method: 'POST',
+              credentials: 'include',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({ targetPseudo: pseudo })
+            });
+
+            const message = document.getElementById('message');
+            if (res.ok) {
+              message.textContent = `Requête d'amitié envoyée à ${pseudo}`;
+              message.style.color = 'green';
+            } else {
+              message.textContent = `Erreur lors de l'ajout de ${pseudo}`;
+              message.style.color = 'red';
+            }
+          });
+
+          li.appendChild(span);
+          li.appendChild(button);
+          list.appendChild(li);
+        });
+      } else {
+        list.innerHTML = '<li>Aucun pseudo trouvé.</li>';
+      }
+
+    });
+
+    async function fetchPendingFriends() {
+      try {
+        const response = await fetch(`https://${window.location.hostname}:8443/usermanagement/front/get/friendships_pending`, {
+          method: 'GET',
+          credentials: 'include'
+        });
+
+        if (!response.ok) {
+          throw new Error('Erreur réseau');
+        }
+
+        const data = await response.json(); // ex: [{ pseudo: 'eqwq', id: 2 }]
+        const list = document.getElementById('friend-list');
+        list.innerHTML = '';
+
+        data.forEach(friend => {
+          const container = document.createElement('div');
+          container.className = 'friend-item';
+
+          const name = document.createElement('span');
+          name.textContent = friend.pseudo;
+
+          const button = document.createElement('button');
+          button.textContent = 'Accept';
+          button.onclick = async () => {
+            try {
+              const postResponse = await fetch(`https://${window.location.hostname}:8443/usermanagement/front/patch/accept_friendship`, {
+                method: 'PATCH',
+                credentials: 'include',
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ id: friend.id })
+              });
+
+              if (!postResponse.ok) {
+                throw new Error('Erreur lors de l\'acceptation');
+              }
+
+              // Retirer l’élément de la liste
+              container.remove();
+            } catch (error) {
+              alert('Erreur : ' + error.message);
+            }
+          };
+
+          container.appendChild(name);
+          container.appendChild(button);
+          list.appendChild(container);
+        });
+
+      } catch (error) {
+        document.getElementById('friend-list').innerText = 'Erreur lors du chargement.';
+        console.error('Erreur:', error);
+      }
+    }
+
+    async function fetchAcceptedFriends() {
+      try {
+        const response = await fetch(`https://${window.location.hostname}:8443/usermanagement/front/get/friendships_accepted`, {
+          method: 'GET',
+          credentials: 'include'
+        });
+
+        if (!response.ok) {
+          throw new Error('Erreur réseau');
+        }
+
+        const data = await response.json(); // ex: [{ pseudo: 'eqwq', id: 2 }]
+        const list = document.getElementById('friend-list-accepted');
+        list.innerHTML = '';
+
+        data.forEach(friend => {
+          const container = document.createElement('div');
+          container.className = 'friend-item';
+
+          const name = document.createElement('span');
+          name.textContent = friend.pseudo;
+
+          const button = document.createElement('button');
+          button.textContent = 'Block';
+          button.onclick = async () => {
+            try {
+              const postResponse = await fetch(`https://${window.location.hostname}:8443/usermanagement/front/patch/block_friendship`, {
+                method: 'PATCH',
+                credentials: 'include',
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ id: friend.id })
+              });
+
+              if (!postResponse.ok) {
+                throw new Error('Erreur lors du blocage');
+              }
+
+              container.remove();
+            } catch (error) {
+              alert('Erreur : ' + error.message);
+            }
+          };
+
+          container.appendChild(name);
+          container.appendChild(button);
+          list.appendChild(container);
+        });
+
+      } catch (error) {
+        document.getElementById('friend-list-accepted').innerText = 'Erreur lors du chargement.';
+        console.error('Erreur:', error);
+      }
+    }
+
+    async function fetchBlockedFriends() {
+      try {
+        const response = await fetch(`https://${window.location.hostname}:8443/usermanagement/front/get/friendships_blocked`, {
+          method: 'GET',
+          credentials: 'include'
+        });
+
+        if (!response.ok) {
+          throw new Error('Erreur réseau');
+        }
+
+        const data = await response.json(); // ex: [{ pseudo: 'eqwq', id: 2 }]
+        const list = document.getElementById('friend-list-blocked');
+        list.innerHTML = '';
+
+        data.forEach(friend => {
+          const container = document.createElement('div');
+          container.className = 'friend-item';
+
+          const name = document.createElement('span');
+          name.textContent = friend.pseudo;
+
+          const button = document.createElement('button');
+          button.textContent = 'Delete';
+          button.onclick = async () => {
+            try {
+              const postResponse = await fetch(`https://${window.location.hostname}:8443/usermanagement/front/delete/delete_friendship`, {
+                method: 'DELETE',
+                credentials: 'include',
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ id: friend.id })
+              });
+
+              if (!postResponse.ok) {
+                throw new Error('Erreur lors du delete');
+              }
+
+              container.remove();
+            } catch (error) {
+              alert('Erreur : ' + error.message);
+            }
+          };
+
+          container.appendChild(name);
+          container.appendChild(button);
+          list.appendChild(container);
+        });
+
+      } catch (error) {
+        document.getElementById('friend-list-blocked').innerText = 'Erreur lors du chargement.';
+        console.error('Erreur:', error);
+      }
+    }
+
+    fetchBlockedFriends();
+
+    fetchAcceptedFriends();
+    // Charger la liste dès que la page est prête
+    fetchPendingFriends();
+    loadProfile();
+
+    document.getElementById('uploadAvatarBtn').addEventListener('click', async () => {
+      const fileInput = document.getElementById('avatarInput');
+      const file = fileInput.files[0];
+
+      if (!file) {
+        alert("Sélectionne une image avant de modifier l’avatar !");
+        return;
+      }
+      // Vérification stricte du type MIME
+      if (file.type !== 'image/jpeg') {
+        alert("Seuls les fichiers JPG sont autorisés !");
+        return;
+      }
+
+      if (file.size >  (2 * 1024 * 1024)) {
+        alert(`L'image est trop lourde (${(file.size / 1024 / 1024).toFixed(2)} Mo). Max autorisé : 2 Mo`);
+        return;
+      }
+
+      // Convertir en base64
+      const reader = new FileReader();
+      reader.onloadend = async () => {
+        const base64 = reader.result; // ex: "data:image/png;base64,AAAA..."
+
+        const response = await fetch(`https://${window.location.hostname}:8443/usermanagement/front/patch/modify_avatar`, {
+          method: 'PATCH',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ avatar: base64 })
+        });
+
+        const msg = document.getElementById('avatarMessage');
+        if (response.ok) {
+          msg.style.color = 'green';
+          msg.textContent = '✅ Avatar mis à jour !';
+          // Mettre à jour l’avatar affiché immédiatement
+          document.getElementById('avatar').src = base64;
+        } else {
+          msg.style.color = 'red';
+          msg.textContent = '❌ Erreur lors de la mise à jour de l’avatar';
+        }
+      };
+
+      reader.readAsDataURL(file);
+    });
+
+    document.getElementById('deleteAvatarBtn').addEventListener('click', async () => {
+      if (!confirm("Êtes-vous sûr de vouloir supprimer votre avatar ?")) return;
+
+      const response = await fetch(`https://${window.location.hostname}:8443/usermanagement/front/delete/delete_avatar`, {
+        method: 'DELETE',
+        credentials: 'include'
+      });
+
+      const msg = document.getElementById('avatarMessage');
+      if (response.ok) {
+        msg.style.color = 'green';
+        msg.textContent = '✅ Avatar supprimé, retour à l’avatar par défaut.';
+        document.getElementById('avatar').src = 'default_avatar.png'; // ou images/default_avatar.png selon ton chemin
+      } else {
+        msg.style.color = 'red';
+        msg.textContent = '❌ Erreur lors de la suppression de l’avatar.';
+      }
+    });
+  </script>
+
+    <!-- Bouton de déconnexion -->
+  <button id="logoutBtn" style="display:none; margin-top: 10px;">
+    Se déconnecter
+  </button>
+
+  <script>
+      // Rendre visible le bouton de logout après connexion réussie
+    document.getElementById('logoutBtn').style.display = 'block';
+
+    // Gérer la déconnexion
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+      fetch(`https://${window.location.hostname}:8443/userauthentication/front/post/logout`, {
+        method: 'POST',
+        credentials: 'include' // important pour envoyer le cookie
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          alert("Déconnexion réussie");
+          window.location.href = './login.html'; // ou page de login
+        } else {
+          alert("Erreur lors de la déconnexion");
+        }
+      })
+      .catch(err => {
+        console.error("Erreur réseau lors du logout :", err);
+      });
+    });
+  </script>
+
+  <script>
+    let currentUserId = null;
+
+    // On récupère l'id du user lors du loadProfile déjà existant
+    async function loadProfileWith2FA() {
+      const sessionResponse = await fetch(`https://${window.location.hostname}:8443/usermanagement/front/get/profile_session`, {
+        method: 'GET',
+        credentials: 'include'
+      });
+
+      if (!sessionResponse.ok) {
+        window.location.href = 'login.html';
+        return;
+      }
+
+      const sessionData = await sessionResponse.json();
+      currentUserId = sessionData.name; // ✅ on sauvegarde l'id de l'utilisateur
+    }
+
+    // On appelle notre version modifiée pour récupérer l'ID
+    loadProfileWith2FA();
+
+    // ✅ 1) Quand on clique sur "Activer la 2FA"
+    document.getElementById('enable2FAButton').addEventListener('click', async () => {
+      if (!currentUserId) {
+        alert("Impossible de récupérer votre profil utilisateur.");
+        return;
+      }
+
+      const response = await fetch(`https://${window.location.hostname}:8443/userauthentication/front/post/2fa/setup`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: currentUserId })
+      });
+
+      if (!response.ok) {
+        alert("Erreur lors de la génération du QR code 2FA");
+        return;
+      }
+
+      const data = await response.json();
+
+      // ✅ Affiche le QR code et la clé manuelle
+      document.getElementById('qrCodeImage').src = data.qrCode;
+      document.getElementById('manualKey').textContent = data.manualKey;
+      document.getElementById('qrCodeContainer').style.display = 'block';
+    });
+
+    // ✅ 2) Quand l'utilisateur entre le code de Google Authenticator et clique sur "Vérifier"
+    document.getElementById('verify2FAButton').addEventListener('click', async () => {
+      const code = document.getElementById('verify2FACode').value.trim();
+
+      if (!code || code.length !== 6) {
+        alert("Veuillez entrer un code à 6 chiffres");
+        return;
+      }
+
+      const response = await fetch(`https://${window.location.hostname}:8443/userauthentication/front/post/2fa/enable`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: currentUserId, google_token: code })
+      });
+
+      const msg = document.getElementById('twoFAStatusMessage');
+
+      if (response.ok) {
+        msg.style.color = "green";
+        msg.textContent = "✅ 2FA activée avec succès !";
+      } else {
+        msg.style.color = "red";
+        msg.textContent = "❌ Code invalide, réessayez.";
+      }
+    });
+  </script>
+  <script>
+    document.getElementById('disable2FAButton').addEventListener('click', async () => {
+      if (!confirm("Êtes-vous sûr de vouloir désactiver la 2FA ?")) return;
+
+      const response = await fetch(`https://${window.location.hostname}:8443/userauthentication/front/patch/2fa/delete`, {
+        method: 'PATCH',
+        credentials: 'include'
+      });
+
+      const msg = document.getElementById('twoFAStatusMessage');
+
+      if (response.ok) {
+        msg.style.color = "green";
+        msg.textContent = "✅ 2FA désactivée avec succès.";
+        alert("La 2FA a été désactivée.");
+      } else {
+        msg.style.color = "red";
+        msg.textContent = "❌ Erreur lors de la désactivation de la 2FA.";
+        alert("Erreur lors de la désactivation.");
+      }
+    });
+  </script>
+
+
+</body>
+</html>

@@ -1,0 +1,33 @@
+p {
+	color: blue;
+	font-size: 35px;
+}
+a {
+	color: red;
+
+}
+#hi {
+	background-color: rgb(140, 166, 146);
+}
+/*comment in css*/
+
+.my_class {
+	background-color: bisque;
+	color: aqua;
+             /* Text color */
+  /* Background color */
+	font-size: 16px;           /* Text size */
+	font-family: Arial;        /* Font type */
+	margin: 10px;              /* Space outside element */
+	padding: 15px;             /* Space inside element */
+	border: 1px solid black;   /* Border */
+	width: 200px;              /* Element width */
+	height: 100px;             /* Element height */
+	display: block;            /* How element displays */
+}
+
+.my_class:hover {
+	color: blueviolet;
+	width: 230px;              /* Element width */
+	height: 115px; 
+}

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Say Hello</title>
+</head>
+<body>
+  <h1>Say Hello</h1>
+  <button onclick="getUsers()">Get All Users</button>
+  <p id="users">Users will appear in the console...</p>
+
+  <button onclick="getProfiles()">Get All Profiles</button>
+  <p id="profiles">Profiles will appear in the console...</p>
+
+  <button onclick="getFriendships()">Get All Friendships</button>
+  <p id="friendships">Profiles will appear in the console...</p>
+
+  <input type="text" id="username" placeholder="Enter username" />
+  <button onclick="getProfile()">Get Profile</button>
+
+  <pre id="result">Result will appear here...</pre>
+
+  <script>
+      async function getUsers() {
+        try {
+          const response = await fetch('/userauthentication/front/get/users');
+          if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+          
+          const text = await response.text(); // use .json() if API returns JSON
+        document.getElementById('users').textContent = text;
+      } catch (error) {
+        document.getElementById('users').textContent = `Error: ${error.message}`;
+      }
+    }
+  </script>
+
+  <script>
+      async function getProfiles() {
+        try {
+          const response = await fetch('/usermanagement/front/get/profiles');
+          if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+          
+          const text = await response.text(); // use .json() if API returns JSON
+        document.getElementById('profiles').textContent = text;
+      } catch (error) {
+        document.getElementById('profiles').textContent = `Error: ${error.message}`;
+      }
+    }
+  </script>
+
+  <script>
+      async function getFriendships() {
+        try {
+          const response = await fetch('/usermanagement/front/get/friendships');
+          if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+          
+          const text = await response.text(); // use .json() if API returns JSON
+        document.getElementById('friendships').textContent = text;
+      } catch (error) {
+        document.getElementById('friendships').textContent = `Error: ${error.message}`;
+      }
+    }
+  </script>
+    
+  <script>
+    async function getProfile() {
+      const username = document.getElementById('username').value.trim();
+
+      if (!username) {
+        document.getElementById('result').textContent = 'Please enter a username.';
+        return;
+      }
+
+      try {
+        const response = await fetch(`/usermanagement/front/get/profile?user=${username}`, {
+          cache: 'no-store'
+        });
+        if (!response.ok) {
+          // Try to extract error message from body
+          const errorText = await response.text();
+          throw new Error(errorText || `HTTP error! Status: ${response.status}`);
+        }
+        const data = await response.text(); // ou .json() selon le retour de l'API
+        document.getElementById('result').textContent = JSON.stringify(data, null, 2);
+      } catch (err) {
+        document.getElementById('result').textContent = `Error: ${err.message}`;
+      }
+    }
+  </script>
+</body>
+</html>

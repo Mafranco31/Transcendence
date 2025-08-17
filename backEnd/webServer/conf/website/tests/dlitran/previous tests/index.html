@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Transcendence</title>
+	<style>
+		body {
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			height: 100vh;
+			margin: 0;
+			background-color: #1a1a1a;
+		}
+		canvas {
+			border: 2px solid white;
+		}
+		#score {
+			position: flex;
+			width: 100%;
+			text-align: center;
+			top: 40px;
+			color: white;
+			font-size: 24px;
+			font-family: monospace;
+		}
+
+		/* --- rules for the dropdown --- */
+
+		/* This is the new container we added in the HTML.
+	   'position: relative' is the key. It creates a positioning
+	   context for the dropdown menu. */
+		.dropdown-container {
+    		position: relative;
+   			 display: inline-block;
+		}
+
+		/* This styles the menu itself. */
+		#dropdownMenu {
+   			position: absolute;   /* This makes it "float" on top of the page */
+    		z-index: 1;           /* Ensures it appears above other elements */
+    		top: 100%;            /* Positions it right below the container */
+    		left: 0;              /* Aligns it to the left of the container */
+    		background-color: #333;
+    		border: 1px solid #555;
+    		border-radius: 5px;
+    		padding: 8px;
+    		min-width: 140px;     /* Prevents it from being too narrow */
+		}
+
+		/* Optional: Style the buttons inside the dropdown to look better */
+		#dropdownMenu button {
+    		width: 100%;
+    		background: none;
+    		border: none;
+    		color: white;
+    		padding: 10px;
+    		text-align: left;
+    		cursor: pointer;
+    		border-radius: 3px;
+		}
+
+		#dropdownMenu button:hover {
+    		background-color: #555;
+		}
+		#topBar {
+		position: fixed;
+		top: 0;
+		left: 0;
+		width: 100%;
+		background-color: #222;
+		color: white;
+		padding: 10px;
+		z-index: 1000; /* so it stays above other content */
+	  }
+	</style>
+</head>
+
+<body>
+	<div>
+		<div id="score">0 - 0</div>
+		<canvas id="playField" width="1280" height="720"></canvas>
+	</div>
+	<div id="topBar">
+		<button>Settings</button>
+		<!--<select id="profileMenu">Profile</select>-->
+		<div class="dropdown-container">
+			<button id="profileButton">Profile</button>
+
+    		<!-- The container for the options, hidden by default -->
+    		<div id="dropdownMenu" hidden>
+				<button>View Profile</button>
+				<button>Log out</button>
+    		</div>
+		</div>
+	</div>
+
+    <form id="loginForm">
+        <label for="name">Username:</label>
+        <input type="text" id="name" required><br><br>
+
+        <label for="pass">Password:</label>
+        <input type="password" id="pass" required><br><br>
+
+        <button type="submit">Sign In</button>
+    </form>
+    <button id="SignUpButton">Sign up</button>
+
+    <form id="signUpForm">
+        <label for="" ></label>
+    </form>
+
+	<script>
+		let isLoggedIn = false; // Change to 'true' to test the other state
+
+        const profileButton = document.getElementById('profileButton');
+        const dropdownMenu = document.getElementById('dropdownMenu');
+
+		profileButton.addEventListener('click', () => {
+    	dropdownMenu.hidden = !dropdownMenu.hidden;
+		});
+
+	</script>
+
+	<script src="./dist/main.js"></script>
+	</script>
+</body>
+</html>

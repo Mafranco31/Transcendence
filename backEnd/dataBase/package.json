@@ -1,0 +1,30 @@
+{
+  "name": "database",
+  "version": "1.0.0",
+  "description": "Servicio Database para el proyecto Trascendence",
+  "main": "dist/database.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/database.js",
+    "dev": "tsc -w & nodemon dist/database.js"
+  },
+  "keywords": [
+    "fastify",
+    "nodejs",
+    "typescript",
+    "database"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@fastify/formbody": "latest",
+    "fastify": "latest",
+    "sqlite3": "latest"
+  },
+  "devDependencies": {
+    "@types/node": "latest",
+    "@types/sqlite3": "latest",
+    "nodemon": "latest",
+    "typescript": "latest"
+  }
+}

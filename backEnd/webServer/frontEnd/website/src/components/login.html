@@ -1,0 +1,175 @@
+<div class="bg-slate-900 flex flex-col justify-center items-center min-h-screen relative">
+
+  <!-- Login Form -->
+  <form id="login-form"
+    data-path="/"
+    autocomplete="off"
+    class="spa-form w-full max-w-sm p-8 space-y-6 bg-slate-800 rounded-xl shadow-lg absolute transition-opacity duration-300"
+  >
+    <h2 class="text-3xl font-bold text-center text-white">Log In</h2>
+
+    <!-- Username -->
+    <div class="space-y-2">
+      <label for="username" class="block text-sm font-medium text-gray-300">Usuario:</label>
+      <input
+        type="text"
+        maxlength="20"
+        id="username"
+        name="name"
+        required
+        class="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-md text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+      >
+    </div>
+
+    <!-- Password -->
+    <div class="space-y-2">
+      <label for="password" class="block text-sm font-medium text-gray-300">Contraseña:</label>
+      <input
+        type="password"
+        maxlength="20"
+        id="password"
+        name="pass"
+        required
+        class="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-md text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+      >
+    </div>
+
+    <!-- Submit Button -->
+    <div class="pt-4">
+      <button
+        type="submit"
+        class="w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-800 focus:ring-indigo-500 transition-colors duration-300"
+      >
+        Log in
+      </button>
+    </div>
+
+    
+    <!-- Error Message (above OR separator) -->
+    <p id="error" class="text-red-500 text-sm text-center mt-2"></p>
+
+    <!-- OR Separator -->
+    <div class="flex items-center justify-center space-x-2 text-sm text-gray-400">
+      <hr class="flex-grow border-gray-600">
+      <span>or</span>
+      <hr class="flex-grow border-gray-600">
+    </div>
+
+    <!-- Google Sign-In centered -->
+    <div id="googleSignInDiv" class="min-h-[60px] flex justify-center"></div>
+
+    <!-- Signup Button under Google -->
+    <div class="text-center">
+      <button
+        type="button"
+        data-path='/signin'
+        class="nav-link text-indigo-400 hover:text-indigo-300 text-sm font-medium transition-colors duration-300"
+      >
+        SIGN IN
+      </button>
+    </div>
+
+    <!-- Error Message -->
+    <p id="error" class="text-red-500 text-sm text-center mt-2"></p>
+  </form>
+
+  <!-- 2FA Section -->
+  <div
+    id="twoFASection"
+    class="hidden w-full max-w-sm p-8 space-y-6 bg-slate-800 rounded-xl shadow-lg absolute transition-opacity duration-300"
+  >
+    <h2 class="text-3xl font-bold text-center text-white">2FA Auth</h2>
+
+    <p class="text-gray-300 text-sm text-center">Enter your 2FA code from:</p>
+
+    <input
+      type="text"
+      id="twoFACode"
+      maxlength="6"
+      placeholder="123456"
+      class="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-md text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+    />
+
+    <button
+      id="verify2FABtn"
+      class="w-full py-3 px-4 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-800 focus:ring-green-500 transition-colors duration-300"
+    >
+      Verify
+    </button>
+
+    <p id="twoFAError" class="text-red-500 text-sm text-center mt-2"></p>
+
+    <!-- SIGN IN button under 2FA -->
+    <div class="text-center">
+      <button
+        type="button"
+        data-path='/signin'
+        class="nav-link text-indigo-400 hover:text-indigo-300 text-sm font-medium transition-colors duration-300"
+      >
+        LOG IN
+      </button>
+    </div>
+  </div>
+
+  <script type="module" src="./dist/login.js"></script>
+</div>
+
+
+<!-- <div class="bg-slate-900 flex flex-col justify-center items-center min-h-screen">
+
+<form id="login-form" data-path="/" autocomplete="off" class="spa-form w-full max-w-sm p-8 space-y-6 bg-slate-800 rounded-xl shadow-lg">
+
+  <h2 class="text-3xl font-bold text-center text-white">Log In</h2>
+
+  <div class="space-y-2">
+    <label for="username" class="block text-sm font-medium text-gray-300">Usuario:</label>
+    <input type="text" maxlength="20" id="username" name="name" required class="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-md text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+  </div>
+  <div class="space-y-2">
+    <label for="password" class="block text-sm font-medium text-gray-300">Contraseña:</label>
+    <input type="password" maxlength="20" id="password" name="pass" required class="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-md text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+  </div>
+  <div class="pt-4">
+    <button type="submit" class="w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-800 focus:ring-indigo-500 transition-colors duration-300">Log in</button>
+  </div>
+</form>
+<div class="mt-6 text-center">
+  <button type="button" data-path='/signin' class="nav-link text-indigo-400 hover:text-indigo-300 text-sm font-medium transition-colors duration-300">SIGN IN</button>
+</div>
+<script type="module" src="./dist/login.js"></script>
+</div> -->
+
+<!-- Google sign in section -->
+<!-- <div id="googleSignInDiv" style="min-height: 60px;"></div>
+
+<p id="error" style="color: red;"></p> -->
+
+<!-- 2FA Section - hidden by default -->
+<!-- <div id="twoFASection" class="hidden mt-6 space-y-4">
+  <h3 class="text-lg font-semibold">2FA Auth</h3>
+  <p>Enter your 2FA code from:</p>
+  <input
+    type="text"
+    id="twoFACode"
+    maxlength="6"
+    placeholder="123456"
+    class="w-full border rounded px-4 py-2"
+  />
+  <button
+    id="verify2FABtn"
+    class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+  >
+    Verify
+  </button>
+  <p id="twoFAError" class="text-red-600 text-sm mt-2"></p>
+</div> -->
+
+<!-- 2FA Section -->
+<!-- <div id="twoFASection">
+  <h3>2fa Auth</h3>
+  <p>Enter your 2fa code from : </p>
+  <input type="text" id="twoFACode" maxlength="6" placeholder="123456">
+  <button id="verify2FABtn">Verify</button>
+  <p id="twoFAError" style="color: red; margin-top: 10px;"></p>
+</div> -->
+

@@ -1,0 +1,8 @@
+TODO
+	Put in typescript game.html and signin.html
+	Change query selector of div of Clone in profile.ts. Make it select a specific div.
+	Add the user status web socket to all pages
+	We can connect directly to profile without being connected
+	Keep user avatars in data to not erase when using 'make down'
+	We can do a research bar to find users
+	There is an error when changing alias and the friend refresh the page he sees 2 times the name of his friend

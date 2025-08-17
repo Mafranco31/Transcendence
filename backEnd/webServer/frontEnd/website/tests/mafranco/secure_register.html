@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Registrar Usuario</title>
+</head>
+<body>
+  <div class="container">
+    <h2>Registrar Usuario</h2>
+    <form id="registerForm">
+      <div>
+        <label for="username">Usuario:</label>
+        <input type="text" id="username" name="name" required>
+      </div>
+      <div>
+        <label for="password">Contraseña:</label>
+        <input type="password" id="password" name="pass" required>
+      </div>
+      <div>
+        <button type="submit">Registrar</button>
+      </div>
+    </form>
+
+    <p id="result"></p>
+  </div>
+
+  <script>
+    async function hashPassword(password) {
+      const encoder = new TextEncoder();
+      const data = encoder.encode(password);
+      const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+      return hashHex;
+    }
+
+    document.getElementById('registerForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const name = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+
+      const hashedPass = await hashPassword(password);
+
+      // Send via fetch using x-www-form-urlencoded
+      const body = new URLSearchParams();
+      body.append('name', name);
+      body.append('pass', hashedPass);
+
+      const response = await fetch('/usermanagement/front/post/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: body.toString()
+      });
+
+      const result = await response.text();
+      document.getElementById('result').textContent = result;
+    });
+  </script>
+</body>
+</html>

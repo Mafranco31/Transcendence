@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Connexion Google</title>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+<body>
+
+  <!-- Bouton de connexion Google : TODO : mettre dans l'env pour le client ID -->
+  <div id="g_id_onload"
+       data-client_id="826866714242-u7rb76no703g0n8vauoq926n9cdkfgv3.apps.googleusercontent.com"
+       data-callback="handleCredentialResponse">
+  </div>
+  <div class="g_id_signin" data-type="standard"></div>
+
+  <!-- Bouton vers profile.html, caché tant qu'on n'est pas connecté -->
+  <button id="goToProfile" style="display:none; margin-top: 20px;">
+    Aller vers mon profil
+  </button>
+
+  <script>
+    function handleCredentialResponse(response) {
+      fetch('/userauthentication/front/post/google_connect', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ credential: response.credential })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          // Affiche le bouton pour aller sur profile.html
+        //   document.getElementById('goToProfile').style.display = 'block';
+            window.location.href = './profile.html';
+        } else {
+          alert("Erreur de connexion : " + (data.error || "Inconnue"));
+        }
+      })
+      .catch(err => {
+        console.error("Erreur réseau :", err);
+      });
+    }
+
+    // Redirection vers le profil
+    document.getElementById('goToProfile').addEventListener('click', () => {
+      window.location.href = './profile.html';
+    });
+  </script>
+
+</body>
+</html>

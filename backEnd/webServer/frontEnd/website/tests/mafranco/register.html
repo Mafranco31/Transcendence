@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Registro de Usuario</title>
+	<style>
+		body {
+			font-family: sans-serif;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			min-height: 100vh;
+			background-color: #f4f4f4;
+			margin: 0;
+		}
+		.container {
+			background-color: white;
+			padding: 20px;
+			border-radius: 8px;
+			box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+		}
+		h2 {
+			text-align: center;
+			color: #333;
+		}
+		label {
+			display: block;
+			margin-bottom: 5px;
+			color: #555;
+		}
+		input[type="text"],
+		input[type="password"] {
+			width: 100%;
+			padding: 10px;
+			margin-bottom: 15px;
+			border: 1px solid #ddd;
+			border-radius: 4px;
+			box-sizing: border-box; /* Para que el padding no afecte el ancho total */
+		}
+		button[type="submit"] {
+			width: 100%;
+			padding: 10px;
+			background-color: #007bff;
+			color: white;
+			border: none;
+			border-radius: 4px;
+			cursor: pointer;
+			font-size: 16px;
+		}
+		button[type="submit"]:hover {
+			background-color: #0056b3;
+		}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<h2>Registrar Usuario</h2>
+		<form action="/userauthentication/front/post/create" method="POST" autocomplete="off">
+			<div>
+				<label for="username">Usuario:</label>
+				<input type="text" id="username" name="name" required>
+				<!-- El atributo 'name' es importante, será la clave en el servidor -->
+			</div>
+			<div>
+				<label for="password">Contraseña:</label>
+				<input type="password" id="password" name="pass" required>
+				<!-- El atributo 'name' es importante -->
+			</div>
+			<div>
+				<button type="submit">Registrar</button>
+			</div>
+		</form>
+	</div>
+</body>
+</html>

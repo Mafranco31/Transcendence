@@ -1,0 +1,38 @@
+{
+  "name": "userauthentication",
+  "version": "1.0.0",
+  "description": "Servicio Userauthentication para el proyecto Trascendence",
+  "main": "dist/userauthentication.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/userauthentication.js",
+    "dev": "tsc -w & nodemon dist/userauthentication.js"
+  },
+  "keywords": [
+    "fastify",
+    "nodejs",
+    "typescript",
+    "userauthentication"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@fastify/cookie": "^11.0.2",
+    "@fastify/cors": "^11.0.1",
+    "@fastify/formbody": "^8.0.2",
+    "@fastify/jwt": "^9.1.0",
+    "@fastify/websocket": "^11.2.0",
+    "bcrypt": "^6.0.0",
+    "fastify": "latest",
+    "google-auth-library": "^10.1.0",
+    "qrcode": "^1.5.4",
+    "speakeasy": "^2.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.3.0",
+    "@types/qrcode": "^1.5.5",
+    "@types/speakeasy": "^2.0.10",
+    "nodemon": "latest",
+    "typescript": "latest"
+  }
+}

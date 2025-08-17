@@ -1,0 +1,28 @@
+{
+  "name": "serverpong",
+  "version": "1.0.0",
+  "description": "Servicio Serverpong para el proyecto Trascendence",
+  "main": "dist/serverpong.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/serverpong.js",
+    "dev": "tsc -w & nodemon dist/serverpong.js"
+  },
+  "keywords": [
+    "fastify",
+    "nodejs",
+    "typescript",
+    "serverpong"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@fastify/websocket": "latest",
+    "fastify": "latest"
+  },
+  "devDependencies": {
+    "@types/node": "latest",
+    "nodemon": "latest",
+    "typescript": "latest"
+  }
+}
